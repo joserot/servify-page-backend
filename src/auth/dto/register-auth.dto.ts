@@ -8,7 +8,6 @@ export class RegisterAuthDto {
   @MaxLength(20)
   name: string;
 
-
   @MinLength(3)
   @MaxLength(20)
   lastName: string;

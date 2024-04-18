@@ -53,6 +53,6 @@ export class AuthService {
 
     const newUser = await this.userModel.create(userParse);
 
-    return newUser;
+    return this.login(userBody);
   }
 }

@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 const saltOrRounds = 10;
 
@@ -9,6 +9,7 @@ const saltOrRounds = 10;
  */
 async function generateHash(passwordPlain: string): Promise<string> {
   const hash = await bcrypt.hash(passwordPlain, saltOrRounds);
+
   return hash;
 }
 

@@ -46,5 +46,8 @@ export class Professional {
 
   @Prop()
   avatar: string;
+
+  @Prop({ default: 0 })
+  likes: number;
 }
 export const ProfessionalSchema = SchemaFactory.createForClass(Professional);

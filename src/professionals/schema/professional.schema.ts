@@ -30,13 +30,13 @@ export class Professional {
   phone: string;
 
   @Prop({ required: true })
-  verifications: string[];
-
-  @Prop({ required: true })
   description: string;
 
   @Prop({ required: true, default: true })
   active: boolean;
+
+  @Prop()
+  verifications: string[];
 
   @Prop()
   price: number;

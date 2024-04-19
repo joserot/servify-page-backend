@@ -32,7 +32,7 @@ export class ProfessionalsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.professionalsService.findOne(+id);
+    return this.professionalsService.findOne(id);
   }
 
   @Patch(':id')
@@ -40,11 +40,11 @@ export class ProfessionalsController {
     @Param('id') id: string,
     @Body() updateProfessionalDto: UpdateProfessionalDto,
   ) {
-    return this.professionalsService.update(+id, updateProfessionalDto);
+    return this.professionalsService.update(id, updateProfessionalDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.professionalsService.remove(+id);
+    return this.professionalsService.remove(id);
   }
 }

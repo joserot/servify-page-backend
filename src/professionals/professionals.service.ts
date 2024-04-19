@@ -1,26 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Professional } from './schema/professional.schema';
 
 @Injectable()
 export class ProfessionalsService {
-  create(_createProfessionalDto: CreateProfessionalDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectModel(Professional.name)
+    private professionalModel: Model<Professional>,
+  ) {}
+
+  async create(_createProfessionalDto: CreateProfessionalDto) {
+    const createdProfessional = new this.professionalModel(
+      _createProfessionalDto,
+    );
+    return createdProfessional.save();
   }
 
   async findAll() {
-    return 'This action returns all users';
+    return this.professionalModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return this.professionalModel.findById(id).exec();
   }
 
-  update(id: number, _updateProfessionalDto: UpdateProfessionalDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, _updateProfessionalDto: UpdateProfessionalDto) {
+    return this.professionalModel.findByIdAndUpdate(
+      id,
+      _updateProfessionalDto,
+      {
+        new: true,
+      },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    return this.professionalModel.findByIdAndDelete(id);
   }
 }

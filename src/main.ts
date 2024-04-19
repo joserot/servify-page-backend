@@ -13,12 +13,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .addBearerAuth()
-    .setTitle('Servify Api')
-    .setDescription('Servify API URLs')
+    .setTitle('Servify API REST')
+    .setDescription('Servify API REST Docs')
     .setVersion('1.0')
-    .addTag('tasks')
-    .addTag('auth')
-    .addTag('users')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

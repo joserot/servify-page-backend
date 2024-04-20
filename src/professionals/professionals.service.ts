@@ -5,12 +5,44 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Professional } from './schema/professional.schema';
 
+interface FiltersObject {
+  active?: boolean;
+  location?: string;
+  profession?: string;
+  locationService?: string;
+}
+
 @Injectable()
 export class ProfessionalsService {
   constructor(
     @InjectModel(Professional.name)
     private professionalModel: Model<Professional>,
   ) {}
+
+  async findByFilters(
+    location: string,
+    profession: string,
+    locationService: string,
+    orderBy: 'likes' | 'price',
+  ) {
+    const filters: FiltersObject = {
+      active: true,
+    };
+
+    if (location) {
+      filters.location = location;
+    }
+
+    if (profession) {
+      filters.profession = profession;
+    }
+
+    if (locationService) {
+      filters.locationService = locationService;
+    }
+
+    return this.professionalModel.find(filters).exec();
+  }
 
   async create(_createProfessionalDto: CreateProfessionalDto) {
     const createdProfessional = new this.professionalModel(

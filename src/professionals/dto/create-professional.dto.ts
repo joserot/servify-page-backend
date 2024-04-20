@@ -25,11 +25,11 @@ export class CreateProfessionalDto {
   profession: string;
 
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(30)
   location: string;
 
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(30)
   locationService: string;
 
   @MinLength(6)

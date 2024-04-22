@@ -14,6 +14,51 @@ export class AuthService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
+  public async googleLogin(req) {
+    if (!req.user) {
+      return 'No user from google';
+    }
+
+    const userExist = await this.userModel.findOne({
+      email: req.user.email,
+    });
+
+    if (!userExist) {
+      const newUser = await this.userModel.create({
+        name: req.user.name,
+        lastName: req.user.lastName,
+        email: req.user.email,
+        avatar: req.user.avatar,
+      });
+
+      const payload = {
+        id: newUser._id,
+      };
+
+      const token = this.jwtService.sign(payload);
+
+      const data = {
+        token,
+        user: newUser,
+      };
+
+      return data;
+    } else {
+      const payload = {
+        id: userExist._id,
+      };
+
+      const token = this.jwtService.sign(payload);
+
+      const data = {
+        token,
+        user: req.user,
+      };
+
+      return data;
+    }
+  }
+
   public async login(userLoginBody: LoginAuthDto) {
     const { password } = userLoginBody;
 
@@ -51,7 +96,7 @@ export class AuthService {
       password: await generateHash(password),
     };
 
-    const newUser = await this.userModel.create(userParse);
+    await this.userModel.create(userParse);
 
     return this.login(userBody);
   }

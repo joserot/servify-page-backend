@@ -1,15 +1,43 @@
-import { Body, Controller, Post, Get, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Request,
+  HttpStatus,
+  Req,
+  Redirect,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import { GoogleOauthGuard } from './google-oauth.guard';
+import { FRONTEND_URL } from 'src/constants/constants';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  @Get('/google')
+  @UseGuards(GoogleOauthGuard)
+  async googleAuth() {
+    return HttpStatus.OK;
+  }
+
+  @Get('/google/callback')
+  @UseGuards(GoogleOauthGuard)
+  @Redirect('https://localhost:3000/api/login', 302)
+  async googleAuthRedirect(@Req() req) {
+    const response: any = await this.authService.googleLogin(req);
+    const token = await response.token;
+
+    if (!token) return response;
+
+    return { url: `${FRONTEND_URL}/api/login?token=${token}` };
+  }
 
   @Post('register')
   handleRegister(@Body() registerBody: RegisterAuthDto) {

@@ -42,7 +42,7 @@ export class Professional {
   price: number;
 
   @Prop()
-  jobsImages: string;
+  jobsImages: string[];
 
   @Prop()
   avatar: string;

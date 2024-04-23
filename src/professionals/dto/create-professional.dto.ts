@@ -13,23 +13,23 @@ export class CreateProfessionalDto {
   email: string;
 
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(30)
   name: string;
 
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(30)
   lastName: string;
 
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(50)
   profession: string;
 
   @MinLength(3)
-  @MaxLength(30)
+  @MaxLength(50)
   location: string;
 
   @MinLength(3)
-  @MaxLength(30)
+  @MaxLength(50)
   locationService: string;
 
   @MinLength(6)
@@ -37,7 +37,7 @@ export class CreateProfessionalDto {
   phone: string;
 
   @MinLength(20)
-  @MaxLength(500)
+  @MaxLength(1000)
   description: string;
 
   @IsOptional()

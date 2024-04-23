@@ -5,10 +5,16 @@ export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ unique: true, default: uuidv4 })
+  @Prop({
+    unique: true,
+    default: uuidv4,
+  })
   id: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({
+    unique: [true, 'El email ya existe'],
+    default: uuidv4,
+  })
   email: string;
 
   @Prop()

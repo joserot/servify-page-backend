@@ -16,7 +16,7 @@ export class AuthService {
 
   public async googleLogin(req) {
     if (!req.user) {
-      return 'No user from google';
+      return 'Usuario no valido';
     }
 
     const userExist = await this.userModel.findOne({
@@ -65,11 +65,18 @@ export class AuthService {
     const userExist = await this.userModel.findOne({
       email: userLoginBody.email,
     });
-    if (!userExist) throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND);
+    if (!userExist)
+      throw new HttpException(
+        'El email o la contraseña es incorrecto',
+        HttpStatus.NOT_FOUND,
+      );
 
     const isCheck = await compareHash(password, userExist.password);
     if (!isCheck)
-      throw new HttpException('PASSWORD_INVALID', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'El email o la contraseña es incorrecto',
+        HttpStatus.CONFLICT,
+      );
 
     const userFlat = userExist.toObject();
     delete userFlat.password;
@@ -89,7 +96,13 @@ export class AuthService {
   }
 
   public async register(userBody: RegisterAuthDto) {
-    const { password, ...user } = userBody;
+    const { password, email, ...user } = userBody;
+
+    const existingUser = await this.userModel.find({ email });
+
+    if (existingUser) {
+      throw new HttpException('El email ya existe', HttpStatus.BAD_REQUEST);
+    }
 
     const userParse = {
       ...user,

@@ -26,17 +26,17 @@ export class UpdateProfessionalDto {
 
   @IsOptional()
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(50)
   profession?: string;
 
   @IsOptional()
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(50)
   location?: string;
 
   @IsOptional()
   @MinLength(3)
-  @MaxLength(20)
+  @MaxLength(50)
   locationService?: string;
 
   @IsOptional()
@@ -46,7 +46,7 @@ export class UpdateProfessionalDto {
 
   @IsOptional()
   @MinLength(20)
-  @MaxLength(500)
+  @MaxLength(1000)
   description?: string;
 
   @IsOptional()

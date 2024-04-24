@@ -42,7 +42,7 @@ export class ProfessionalsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get('admin')
   findAll() {
     return this.professionalsService.findAll();
   }

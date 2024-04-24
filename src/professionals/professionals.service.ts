@@ -41,7 +41,7 @@ export class ProfessionalsService {
       filters.locationService = locationService;
     }
 
-    return this.professionalModel.find(filters).exec();
+    return this.professionalModel.find(filters).sort(orderBy).exec();
   }
 
   async create(_createProfessionalDto: CreateProfessionalDto) {

@@ -36,21 +36,20 @@ export class ProfessionalsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post()
-  create(@Body() createProfessionalDto: CreateProfessionalDto) {
-    return this.professionalsService.create(createProfessionalDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('admin')
+  @Get('all')
   findAll() {
     return this.professionalsService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.professionalsService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  create(@Body() createProfessionalDto: CreateProfessionalDto) {
+    return this.professionalsService.create(createProfessionalDto);
   }
 
   @UseGuards(JwtAuthGuard)

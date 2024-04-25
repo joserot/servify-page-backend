@@ -41,7 +41,14 @@ export class ProfessionalsService {
       filters.locationService = locationService;
     }
 
-    return this.professionalModel.find(filters).sort(orderBy).exec();
+    const order: any =
+      orderBy === 'price'
+        ? orderBy
+        : orderBy === 'likes'
+        ? [[orderBy, -1]]
+        : '';
+
+    return this.professionalModel.find(filters).sort(order).exec();
   }
 
   async create(_createProfessionalDto: CreateProfessionalDto) {

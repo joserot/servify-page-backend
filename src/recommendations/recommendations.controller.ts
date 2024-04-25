@@ -15,7 +15,7 @@ export class RecommendationsController {
     return this.recommendationsService.create(createRecommendationDto);
   }
 
-  @Get()
+  @Get(':professionalId')
   findAll(@Param('professionalId') professionalId: string) {
     if (!professionalId) return this.recommendationsService.findAll();
 

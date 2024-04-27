@@ -21,6 +21,23 @@ import { FRONTEND_URL } from 'src/constants/constants';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('login')
+  handleLogin(@Body() loginBody: LoginAuthDto) {
+    return this.authService.login(loginBody);
+  }
+
+  @Post('register')
+  handleRegister(@Body() registerBody: RegisterAuthDto) {
+    return this.authService.register(registerBody);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
+  }
+
   @Get('/google')
   @UseGuards(GoogleOauthGuard)
   async googleAuth() {
@@ -37,21 +54,5 @@ export class AuthController {
     if (!token) return response;
 
     return { url: `${FRONTEND_URL}/api/login?token=${token}` };
-  }
-
-  @Post('register')
-  handleRegister(@Body() registerBody: RegisterAuthDto) {
-    return this.authService.register(registerBody);
-  }
-
-  @Post('login')
-  handleLogin(@Body() loginBody: LoginAuthDto) {
-    return this.authService.login(loginBody);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

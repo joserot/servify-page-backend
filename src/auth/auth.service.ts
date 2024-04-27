@@ -60,11 +60,12 @@ export class AuthService {
   }
 
   public async login(userLoginBody: LoginAuthDto) {
-    const { password } = userLoginBody;
+    const { password, email } = await userLoginBody;
 
     const userExist = await this.userModel.findOne({
-      email: userLoginBody.email,
+      email,
     });
+
     if (!userExist)
       throw new HttpException(
         'El email o la contraseña es incorrecto',
@@ -96,20 +97,22 @@ export class AuthService {
   }
 
   public async register(userBody: RegisterAuthDto) {
-    const { password, email, ...user } = userBody;
+    const { password, email, name, lastName } = userBody;
 
     const existingUser = await this.userModel.find({ email });
 
-    if (existingUser) {
+    if (existingUser && existingUser.length) {
       throw new HttpException('El email ya existe', HttpStatus.BAD_REQUEST);
     }
 
     const userParse = {
-      ...user,
+      name,
+      email,
+      lastName,
       password: await generateHash(password),
     };
 
-    await this.userModel.create(userParse);
+    const newUser = await this.userModel.create(userParse);
 
     return this.login(userBody);
   }

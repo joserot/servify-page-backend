@@ -14,6 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ProfessionalsService } from './professionals.service';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
+import { RolesGuardGuard } from 'src/auth/roles-guard.guard';
 
 @ApiTags('professionals')
 @Controller('professionals')
@@ -35,7 +36,7 @@ export class ProfessionalsController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Get('all')
   findAll() {
     return this.professionalsService.findAll();
@@ -46,13 +47,13 @@ export class ProfessionalsController {
     return this.professionalsService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Post()
   create(@Body() createProfessionalDto: CreateProfessionalDto) {
     return this.professionalsService.create(createProfessionalDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -61,7 +62,7 @@ export class ProfessionalsController {
     return this.professionalsService.update(id, updateProfessionalDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.professionalsService.remove(id);

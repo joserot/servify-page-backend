@@ -18,8 +18,4 @@ export class UpdateUserDto {
     message: 'El apellido debe tener 30 caracteres como máximo',
   })
   lastName?: string;
-
-  @IsOptional()
-  @IsString()
-  avatar?: string;
 }

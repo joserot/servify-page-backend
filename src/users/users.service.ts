@@ -4,6 +4,8 @@ import { User } from './schema/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
+import uploadImage from 'src/functions/upload-image';
+
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
@@ -18,8 +20,22 @@ export class UsersService {
     return user;
   }
 
-  update(id: string, _updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(id, _updateUserDto, { new: true });
+  async update(id: string, _updateUserDto: UpdateUserDto, file: any) {
+    if (!file) {
+      return this.userModel.findByIdAndUpdate(id, _updateUserDto, {
+        new: true,
+      });
+    }
+
+    const imageUrl = await uploadImage(file);
+
+    return this.userModel.findByIdAndUpdate(
+      id,
+      { ..._updateUserDto, avatar: imageUrl },
+      {
+        new: true,
+      },
+    );
   }
 
   remove(id: string) {

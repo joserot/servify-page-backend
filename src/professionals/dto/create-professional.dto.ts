@@ -51,8 +51,4 @@ export class CreateProfessionalDto {
   @IsOptional()
   @IsArray()
   jobsImages?: string[];
-
-  @IsOptional()
-  @IsString()
-  avatar?: string;
 }

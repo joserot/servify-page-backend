@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Professional } from './schema/professional.schema';
 
+import uploadImage from 'src/functions/upload-image';
+
 interface FiltersObject {
   active?: boolean;
   location?: string;
@@ -51,10 +53,21 @@ export class ProfessionalsService {
     return this.professionalModel.find(filters).sort(order).exec();
   }
 
-  async create(_createProfessionalDto: CreateProfessionalDto) {
-    const createdProfessional = new this.professionalModel(
-      _createProfessionalDto,
-    );
+  async create(_createProfessionalDto: CreateProfessionalDto, file: any) {
+    if (!file) {
+      const createdProfessional = new this.professionalModel(
+        _createProfessionalDto,
+      );
+      return createdProfessional.save();
+    }
+
+    const imageUrl = await uploadImage(file);
+
+    const createdProfessional = new this.professionalModel({
+      ..._createProfessionalDto,
+      avatar: imageUrl,
+    });
+
     return createdProfessional.save();
   }
 
@@ -66,10 +79,26 @@ export class ProfessionalsService {
     return this.professionalModel.findById(id).exec();
   }
 
-  update(id: string, _updateProfessionalDto: UpdateProfessionalDto) {
+  async update(
+    id: string,
+    _updateProfessionalDto: UpdateProfessionalDto,
+    file: any,
+  ) {
+    if (!file) {
+      return this.professionalModel.findByIdAndUpdate(
+        id,
+        _updateProfessionalDto,
+        {
+          new: true,
+        },
+      );
+    }
+
+    const imageUrl = await uploadImage(file);
+
     return this.professionalModel.findByIdAndUpdate(
       id,
-      _updateProfessionalDto,
+      { ..._updateProfessionalDto, avatar: imageUrl },
       {
         new: true,
       },

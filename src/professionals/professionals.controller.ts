@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
@@ -15,6 +17,7 @@ import { ProfessionalsService } from './professionals.service';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
 import { RolesGuardGuard } from 'src/auth/roles-guard.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('professionals')
 @Controller('professionals')
@@ -49,17 +52,24 @@ export class ProfessionalsController {
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Post()
-  create(@Body() createProfessionalDto: CreateProfessionalDto) {
-    return this.professionalsService.create(createProfessionalDto);
+  @UseInterceptors(FileInterceptor('avatar'))
+  create(
+    @Body() createProfessionalDto: CreateProfessionalDto,
+    @UploadedFile() file,
+  ) {
+    return this.professionalsService.create(createProfessionalDto, file);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Patch(':id')
+  @Post()
+  @UseInterceptors(FileInterceptor('avatar'))
   update(
     @Param('id') id: string,
     @Body() updateProfessionalDto: UpdateProfessionalDto,
+    @UploadedFile() file,
   ) {
-    return this.professionalsService.update(id, updateProfessionalDto);
+    return this.professionalsService.update(id, updateProfessionalDto, file);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)

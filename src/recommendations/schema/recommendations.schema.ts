@@ -19,6 +19,9 @@ export class Recommendation {
 
   @Prop()
   text: string;
+
+  @Prop()
+  avatar: string;
 }
 export const RecommendationSchema =
   SchemaFactory.createForClass(Recommendation);

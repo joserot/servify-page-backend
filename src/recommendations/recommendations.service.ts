@@ -45,7 +45,7 @@ export class RecommendationsService {
 
   async findAllByProfessional(professionalId: string) {
     const recommends = await this.recommendationModel
-      .find({ professionalId, like: true })
+      .find({ professionalId })
       .exec();
 
     return recommends;

@@ -24,4 +24,8 @@ export class CreateRecommendationDto {
   @IsOptional()
   @MaxLength(200)
   text: string;
+
+  @IsString()
+  @IsOptional()
+  avatar: string;
 }

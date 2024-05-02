@@ -9,7 +9,7 @@ import { RecommendationsModule } from './recommendations/recommendations.module'
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot('mongodb://0.0.0.0:27017/servify'),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
     UsersModule,
     ProfessionalsModule,

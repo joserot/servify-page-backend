@@ -45,8 +45,8 @@ export class CreateProfessionalDto {
   verifications?: string[];
 
   @IsOptional()
-  @IsNumber()
-  price?: number;
+  @IsString()
+  price?: string;
 
   @IsOptional()
   @IsArray()

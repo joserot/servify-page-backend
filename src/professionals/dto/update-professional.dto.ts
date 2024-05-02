@@ -3,10 +3,8 @@ import {
   MaxLength,
   MinLength,
   IsArray,
-  IsNumber,
   IsString,
   IsOptional,
-  IsBoolean,
 } from 'class-validator';
 
 export class UpdateProfessionalDto {
@@ -54,8 +52,8 @@ export class UpdateProfessionalDto {
   verifications?: string[];
 
   @IsOptional()
-  @IsNumber()
-  price?: number;
+  @IsString()
+  price?: string;
 
   @IsOptional()
   @IsArray()
@@ -66,6 +64,6 @@ export class UpdateProfessionalDto {
   avatar?: string;
 
   @IsOptional()
-  @IsBoolean()
-  active?: boolean;
+  @IsString()
+  active?: string;
 }

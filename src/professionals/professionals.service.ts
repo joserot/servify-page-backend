@@ -55,9 +55,10 @@ export class ProfessionalsService {
 
   async create(_createProfessionalDto: CreateProfessionalDto, file: any) {
     if (!file) {
-      const createdProfessional = new this.professionalModel(
-        _createProfessionalDto,
-      );
+      const createdProfessional = new this.professionalModel({
+        ..._createProfessionalDto,
+        price: Number(_createProfessionalDto.price),
+      });
       return createdProfessional.save();
     }
 
@@ -66,6 +67,7 @@ export class ProfessionalsService {
     const createdProfessional = new this.professionalModel({
       ..._createProfessionalDto,
       avatar: imageUrl,
+      price: Number(_createProfessionalDto.price),
     });
 
     return createdProfessional.save();
@@ -84,10 +86,16 @@ export class ProfessionalsService {
     _updateProfessionalDto: UpdateProfessionalDto,
     file: any,
   ) {
+    console.log(_updateProfessionalDto);
+
     if (!file) {
       return this.professionalModel.findByIdAndUpdate(
         id,
-        _updateProfessionalDto,
+        {
+          ..._updateProfessionalDto,
+          price: Number(_updateProfessionalDto.price),
+          active: _updateProfessionalDto.active === '1' ? true : false,
+        },
         {
           new: true,
         },
@@ -98,7 +106,12 @@ export class ProfessionalsService {
 
     return this.professionalModel.findByIdAndUpdate(
       id,
-      { ..._updateProfessionalDto, avatar: imageUrl },
+      {
+        ..._updateProfessionalDto,
+        avatar: imageUrl,
+        price: Number(_updateProfessionalDto.price),
+        active: _updateProfessionalDto.active === '1' ? true : false,
+      },
       {
         new: true,
       },

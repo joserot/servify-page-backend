@@ -56,14 +56,6 @@ export class UpdateProfessionalDto {
   price?: string;
 
   @IsOptional()
-  @IsArray()
-  jobsImages?: string[];
-
-  @IsOptional()
-  @IsString()
-  avatar?: string;
-
-  @IsOptional()
   @IsString()
   active?: string;
 }

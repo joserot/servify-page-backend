@@ -7,6 +7,8 @@ import { Professional } from './schema/professional.schema';
 
 import uploadImage from 'src/functions/upload-image';
 
+import uploadMultipleImages from 'src/functions/upload-multiple-images';
+
 interface FiltersObject {
   active?: boolean;
   location?: string;
@@ -84,16 +86,66 @@ export class ProfessionalsService {
   async update(
     id: string,
     _updateProfessionalDto: UpdateProfessionalDto,
-    file: any,
+    avatar: any,
+    jobsImages: any[],
   ) {
-    console.log(_updateProfessionalDto);
+    const price = _updateProfessionalDto.price
+      ? Number(_updateProfessionalDto.price)
+      : 0;
 
-    if (!file) {
+    if (!avatar && !jobsImages) {
       return this.professionalModel.findByIdAndUpdate(
         id,
         {
           ..._updateProfessionalDto,
-          price: Number(_updateProfessionalDto.price),
+          price,
+          active: _updateProfessionalDto.active === '1' ? true : false,
+        },
+        {
+          new: true,
+        },
+      );
+    } else if (avatar && !jobsImages) {
+      const imageUrl = await uploadImage(avatar);
+
+      return this.professionalModel.findByIdAndUpdate(
+        id,
+        {
+          ..._updateProfessionalDto,
+          avatar: imageUrl,
+          price,
+          active: _updateProfessionalDto.active === '1' ? true : false,
+        },
+        {
+          new: true,
+        },
+      );
+    } else if (!avatar && jobsImages) {
+      const imagesUrl = await uploadMultipleImages(jobsImages);
+
+      return this.professionalModel.findByIdAndUpdate(
+        id,
+        {
+          ..._updateProfessionalDto,
+          jobsImages: imagesUrl,
+          price,
+          active: _updateProfessionalDto.active === '1' ? true : false,
+        },
+        {
+          new: true,
+        },
+      );
+    } else {
+      const imageUrl = await uploadImage(avatar);
+      const imagesUrl = await uploadMultipleImages(jobsImages);
+
+      return this.professionalModel.findByIdAndUpdate(
+        id,
+        {
+          ..._updateProfessionalDto,
+          jobsImages: imagesUrl,
+          avatar: imageUrl,
+          price,
           active: _updateProfessionalDto.active === '1' ? true : false,
         },
         {
@@ -101,21 +153,6 @@ export class ProfessionalsService {
         },
       );
     }
-
-    const imageUrl = await uploadImage(file);
-
-    return this.professionalModel.findByIdAndUpdate(
-      id,
-      {
-        ..._updateProfessionalDto,
-        avatar: imageUrl,
-        price: Number(_updateProfessionalDto.price),
-        active: _updateProfessionalDto.active === '1' ? true : false,
-      },
-      {
-        new: true,
-      },
-    );
   }
 
   remove(id: string) {

@@ -47,8 +47,4 @@ export class CreateProfessionalDto {
   @IsOptional()
   @IsString()
   price?: string;
-
-  @IsOptional()
-  @IsArray()
-  jobsImages?: string[];
 }

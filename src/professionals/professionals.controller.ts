@@ -10,6 +10,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
@@ -17,7 +18,10 @@ import { ProfessionalsService } from './professionals.service';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
 import { RolesGuardGuard } from 'src/auth/roles-guard.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 
 @ApiTags('professionals')
 @Controller('professionals')
@@ -63,13 +67,30 @@ export class ProfessionalsController {
   @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Patch(':id')
   @Post()
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'avatar', maxCount: 1 },
+      { name: 'jobsImages', maxCount: 20 },
+    ]),
+  )
   update(
     @Param('id') id: string,
     @Body() updateProfessionalDto: UpdateProfessionalDto,
-    @UploadedFile() file,
+
+    @UploadedFiles()
+    files: {
+      avatar?;
+      jobsImages?;
+    },
   ) {
-    return this.professionalsService.update(id, updateProfessionalDto, file);
+    const { avatar, jobsImages } = files;
+
+    return this.professionalsService.update(
+      id,
+      updateProfessionalDto,
+      avatar,
+      jobsImages,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)

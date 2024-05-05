@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ProfessionalsModule } from './professionals/professionals.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { ContactsProfessionalsModule } from './contacts-professionals/contacts-professionals.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ContactsModule } from './contacts/contacts.module';
     ProfessionalsModule,
     RecommendationsModule,
     ContactsModule,
+    ContactsProfessionalsModule,
   ],
   controllers: [],
   providers: [],

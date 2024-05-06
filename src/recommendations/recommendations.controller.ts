@@ -2,6 +2,9 @@ import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { RecommendationsService } from './recommendations.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateRecommendationDto } from './dto/create-recommendation.dto';
+import { UseGuards } from '@nestjs/common';
+import { RolesGuardGuard } from 'src/auth/roles-guard.guard';
+import { JwtAuthGuard } from 'src/auth/auth.guard';
 
 @ApiTags('recommendations')
 @Controller('recommendations')
@@ -22,6 +25,12 @@ export class RecommendationsController {
     return this.recommendationsService.findAllByProfessional(professionalId);
   }
 
+  @Get('')
+  findAllAdmin() {
+    return this.recommendationsService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.recommendationsService.remove(id);

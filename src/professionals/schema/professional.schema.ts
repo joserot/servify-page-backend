@@ -49,5 +49,17 @@ export class Professional {
 
   @Prop({ default: 0 })
   likes: number;
+
+  @Prop()
+  startDay: string;
+
+  @Prop()
+  endDay: string;
+
+  @Prop()
+  startTime: string;
+
+  @Prop()
+  endTime: string;
 }
 export const ProfessionalSchema = SchemaFactory.createForClass(Professional);

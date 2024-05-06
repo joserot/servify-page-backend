@@ -58,4 +58,20 @@ export class UpdateProfessionalDto {
   @IsOptional()
   @IsString()
   active?: string;
+
+  @IsOptional()
+  @IsString()
+  startDay?: string;
+
+  @IsOptional()
+  @IsString()
+  endDay?: string;
+
+  @IsOptional()
+  @IsString()
+  startTime?: string;
+
+  @IsOptional()
+  @IsString()
+  endTime?: string;
 }

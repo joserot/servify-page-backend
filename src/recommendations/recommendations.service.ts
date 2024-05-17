@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { CreateRecommendationDto } from './dto/create-recommendation.dto';
+import { UpdateRecommendationDto } from './dto/update-recommendation.dto';
 import { Recommendation } from './schema/recommendations.schema';
 import { Professional } from 'src/professionals/schema/professional.schema';
 import { Model } from 'mongoose';
@@ -37,15 +38,29 @@ export class RecommendationsService {
     return createdRecommend.save();
   }
 
+  async update(id: string, updateRecommendationDto: UpdateRecommendationDto) {
+    return this.recommendationModel.findByIdAndUpdate(
+      id,
+      updateRecommendationDto,
+      {
+        new: true,
+      },
+    );
+  }
+
   async findAll() {
     const recommends = await this.recommendationModel.find().exec();
 
     return recommends;
   }
 
+  findOne(id: string) {
+    return this.recommendationModel.findById(id).exec();
+  }
+
   async findAllByProfessional(professionalId: string) {
     const recommends = await this.recommendationModel
-      .find({ professionalId })
+      .find({ professionalId, active: true })
       .exec();
 
     return recommends;

@@ -14,6 +14,12 @@ export class Recommendation {
   @Prop({ required: true })
   professionalId: string;
 
+  @Prop({ required: true, default: false })
+  active: boolean;
+
+  @Prop({ required: true, default: false })
+  featured: boolean;
+
   @Prop()
   name: string;
 

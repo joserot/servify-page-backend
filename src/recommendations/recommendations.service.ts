@@ -48,8 +48,20 @@ export class RecommendationsService {
     );
   }
 
-  async findAll() {
-    const recommends = await this.recommendationModel.find().exec();
+  async findAll(id?: string) {
+    if (!id) {
+      const recommends = await this.recommendationModel
+        .find()
+        .sort([['date', 'desc']])
+        .exec();
+
+      return recommends;
+    }
+
+    const recommends = await this.recommendationModel
+      .find({ professionalId: id })
+      .sort([['date', 'desc']])
+      .exec();
 
     return recommends;
   }

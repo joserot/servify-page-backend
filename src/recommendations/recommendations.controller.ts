@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  Query,
 } from '@nestjs/common';
 import { RecommendationsService } from './recommendations.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -48,8 +49,10 @@ export class RecommendationsController {
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Get()
-  findAllAdmin() {
-    return this.recommendationsService.findAll();
+  findAllAdmin(@Query('id') id: string) {
+    if (!id) return this.recommendationsService.findAll();
+
+    return this.recommendationsService.findAll(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)

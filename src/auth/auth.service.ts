@@ -6,12 +6,19 @@ import { compareHash, generateHash } from './utils/handleBcrypt';
 import { User, UserDocument } from '../users/schema/user.schema';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
+import {
+  Professional,
+  ProfessionalDocument,
+} from 'src/professionals/schema/professional.schema';
+import { RegisterAuthProfessionalDto } from './dto/register-auth-professional.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(Professional.name)
+    private readonly professionalModel: Model<ProfessionalDocument>,
   ) {}
 
   public async googleLogin(req) {
@@ -113,6 +120,49 @@ export class AuthService {
     };
 
     const newUser = await this.userModel.create(userParse);
+
+    return this.login(userBody);
+  }
+
+  public async registerProfessional(userBody: RegisterAuthProfessionalDto) {
+    const {
+      password,
+      email,
+      name,
+      lastName,
+      profession,
+      location,
+      locationService,
+      phone,
+      price,
+    } = userBody;
+
+    const existingUser = await this.userModel.find({ email });
+
+    if (existingUser && existingUser.length) {
+      throw new HttpException('El email ya existe', HttpStatus.BAD_REQUEST);
+    }
+
+    const userParse = {
+      name,
+      email,
+      lastName,
+      password: await generateHash(password),
+      roles: ['user', 'professional'],
+    };
+
+    const newUser = await this.userModel.create(userParse);
+    const userId = await newUser._id;
+
+    await this.professionalModel.create({
+      userId,
+      profession,
+      location,
+      locationService,
+      phone,
+      price: Number(price),
+      active: false,
+    });
 
     return this.login(userBody);
   }

@@ -11,12 +11,14 @@ import {
   UseInterceptors,
   UploadedFile,
   UploadedFiles,
+  Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { ProfessionalsService } from './professionals.service';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
+import { UpdateMyProfileProfessionalDto } from './dto/update-my-profile-professional.dto';
 import { RolesGuardGuard } from 'src/auth/roles-guard.guard';
 import {
   FileInterceptor,
@@ -43,6 +45,12 @@ export class ProfessionalsController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/:userId')
+  findByUserId(@Param('userId') userId: string) {
+    return this.professionalsService.findByUserId(userId);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Get('all')
   findAll() {
@@ -64,13 +72,32 @@ export class ProfessionalsController {
     return this.professionalsService.create(createProfessionalDto, file);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('/profile/:id')
+  @UseInterceptors(FileInterceptor('avatar'))
+  async updateProfile(
+    @Param('id') id: string,
+    @Body() updateProfessionalDto: UpdateMyProfileProfessionalDto,
+    @UploadedFile() file,
+    @Request() req,
+  ) {
+    const userId = await req.user._id.toString();
+
+    return this.professionalsService.updateProfile(
+      id,
+      updateProfessionalDto,
+      file,
+      userId,
+    );
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuardGuard)
   @Patch(':id')
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'avatar', maxCount: 1 },
-      { name: 'jobsImages', maxCount: 20 },
+      { name: 'jobsImages', maxCount: 10 },
     ]),
   )
   update(

@@ -16,6 +16,7 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GoogleOauthGuard } from './google-oauth.guard';
 import { FRONTEND_URL } from 'src/constants/constants';
+import { RegisterAuthProfessionalDto } from './dto/register-auth-professional.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,6 +31,13 @@ export class AuthController {
   @Post('register')
   handleRegister(@Body() registerBody: RegisterAuthDto) {
     return this.authService.register(registerBody);
+  }
+
+  @Post('/register/professional')
+  handleRegisterProfessional(
+    @Body() registerBody: RegisterAuthProfessionalDto,
+  ) {
+    return this.authService.registerProfessional(registerBody);
   }
 
   @UseGuards(JwtAuthGuard)

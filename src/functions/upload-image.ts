@@ -4,12 +4,16 @@ import { PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
 export default async function uploadImage(file: any) {
-  const fileExtension = await file.originalname.split('.').pop();
+  const existingFile = file[0] ? file[0] : file;
+
+  const fileExtension = await existingFile.originalname.split('.').pop();
+
+  const body = await existingFile.buffer;
 
   const bucketParams: PutObjectCommandInput = {
     Bucket: 'servify',
     Key: `${uuidv4()}.${fileExtension}`,
-    Body: file.buffer,
+    Body: body,
     ACL: 'public-read',
   };
 

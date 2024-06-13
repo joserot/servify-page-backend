@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProfessionalDto } from './dto/create-professional.dto';
 import { UpdateProfessionalDto } from './dto/update-professional.dto';
+import { UpdateMyProfileProfessionalDto } from './dto/update-my-profile-professional.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Professional } from './schema/professional.schema';
+import { User } from 'src/users/schema/user.schema';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { generateHash } from 'src/auth/utils/handleBcrypt';
 
 import uploadImage from 'src/functions/upload-image';
 
@@ -21,6 +25,8 @@ export class ProfessionalsService {
   constructor(
     @InjectModel(Professional.name)
     private professionalModel: Model<Professional>,
+    @InjectModel(User.name)
+    private userModel: Model<User>,
   ) {}
 
   async findByFilters(
@@ -52,35 +58,116 @@ export class ProfessionalsService {
         ? [[orderBy, -1]]
         : '';
 
-    return this.professionalModel.find(filters).sort(order).exec();
+    return this.professionalModel
+      .find(filters)
+      .sort(order)
+      .populate('userId')
+      .exec();
+  }
+
+  async findByUserId(userId: string) {
+    return this.professionalModel
+      .findOne({ userId: userId })
+      .populate('userId')
+      .exec();
   }
 
   async create(_createProfessionalDto: CreateProfessionalDto, file: any) {
+    const {
+      name,
+      lastName,
+      email,
+      profession,
+      location,
+      locationService,
+      phone,
+      price,
+      description,
+      verifications,
+      startDay,
+      endDay,
+      startTime,
+      endTime,
+    } = _createProfessionalDto;
+
+    const existingUser = await this.userModel.find({ email });
+
+    if (existingUser && existingUser.length) {
+      throw new HttpException('El email ya existe', HttpStatus.BAD_REQUEST);
+    }
+
+    const password = 'bwWMnzAw82bAKOi';
+
     if (!file) {
-      const createdProfessional = new this.professionalModel({
-        ..._createProfessionalDto,
-        price: Number(_createProfessionalDto.price),
+      const userParse = {
+        name,
+        email,
+        lastName,
+        password: await generateHash(password),
+        roles: ['user', 'professional'],
+      };
+
+      const newUser = await this.userModel.create(userParse);
+      const userId = await newUser._id;
+
+      const createdProfessional = await this.professionalModel.create({
+        userId,
+        profession,
+        location,
+        locationService,
+        phone,
+        price: Number(price),
+        active: false,
+        description,
+        verifications,
+        startDay,
+        endDay,
+        startTime,
+        endTime,
       });
+
       return createdProfessional.save();
     }
 
     const imageUrl = await uploadImage(file);
 
-    const createdProfessional = new this.professionalModel({
-      ..._createProfessionalDto,
+    const userParse = {
+      name,
+      email,
+      lastName,
+      password: await generateHash(password),
+      roles: ['user', 'professional'],
       avatar: imageUrl,
-      price: Number(_createProfessionalDto.price),
+    };
+
+    const newUser = await this.userModel.create(userParse);
+    const userId = await newUser._id;
+
+    const createdProfessional = await this.professionalModel.create({
+      userId,
+      profession,
+      location,
+      locationService,
+      phone,
+      price: Number(price),
+      active: false,
+      description,
+      verifications,
+      startDay,
+      endDay,
+      startTime,
+      endTime,
     });
 
     return createdProfessional.save();
   }
 
   async findAll() {
-    return this.professionalModel.find().exec();
+    return this.professionalModel.find().populate('userId').exec();
   }
 
   findOne(id: string) {
-    return this.professionalModel.findById(id).exec();
+    return this.professionalModel.findById(id).populate('userId').exec();
   }
 
   async update(
@@ -108,11 +195,11 @@ export class ProfessionalsService {
     } else if (avatar && !jobsImages) {
       const imageUrl = await uploadImage(avatar);
 
-      return this.professionalModel.findByIdAndUpdate(
+      const professional = await this.professionalModel.findByIdAndUpdate(
         id,
         {
           ..._updateProfessionalDto,
-          avatar: imageUrl,
+
           price,
           active: _updateProfessionalDto.active === '1' ? true : false,
         },
@@ -120,6 +207,12 @@ export class ProfessionalsService {
           new: true,
         },
       );
+
+      await this.userModel.findByIdAndUpdate(professional.userId, {
+        avatar: imageUrl,
+      });
+
+      return professional;
     } else if (!avatar && jobsImages) {
       const imagesUrl = await uploadMultipleImages(jobsImages);
 
@@ -139,12 +232,11 @@ export class ProfessionalsService {
       const imageUrl = await uploadImage(avatar);
       const imagesUrl = await uploadMultipleImages(jobsImages);
 
-      return this.professionalModel.findByIdAndUpdate(
+      const professional = await this.professionalModel.findByIdAndUpdate(
         id,
         {
           ..._updateProfessionalDto,
           jobsImages: imagesUrl,
-          avatar: imageUrl,
           price,
           active: _updateProfessionalDto.active === '1' ? true : false,
         },
@@ -152,6 +244,67 @@ export class ProfessionalsService {
           new: true,
         },
       );
+
+      await this.userModel.findByIdAndUpdate(professional.userId, {
+        avatar: imageUrl,
+      });
+
+      return professional;
+    }
+  }
+
+  async updateProfile(
+    id: string,
+    _updateProfessionalDto: UpdateMyProfileProfessionalDto,
+    avatar: any,
+    userId: string,
+  ) {
+    const professional = await this.professionalModel.findById(id);
+    const professionalUserId = await professional.userId.toString();
+
+    if (professionalUserId !== userId) {
+      throw new HttpException(
+        'No se encontro el profesional',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const price = _updateProfessionalDto.price
+      ? Number(_updateProfessionalDto.price)
+      : 0;
+
+    if (!avatar) {
+      return this.professionalModel.findByIdAndUpdate(
+        id,
+        {
+          ..._updateProfessionalDto,
+          price,
+          active: false,
+        },
+        {
+          new: true,
+        },
+      );
+    } else {
+      const imageUrl = await uploadImage(avatar);
+
+      const professional = await this.professionalModel.findByIdAndUpdate(
+        id,
+        {
+          ..._updateProfessionalDto,
+          price,
+          active: false,
+        },
+        {
+          new: true,
+        },
+      );
+
+      await this.userModel.findByIdAndUpdate(professional.userId, {
+        avatar: imageUrl,
+      });
+
+      return professional;
     }
   }
 

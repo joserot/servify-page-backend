@@ -7,6 +7,10 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { JwtHandle } from './utils/jwt-handle';
 import { User, UserSchema } from '../users/schema/user.schema';
 import { GoogleStrategy } from './strategy/google.strategy';
+import {
+  Professional,
+  ProfessionalSchema,
+} from 'src/professionals/schema/professional.schema';
 
 @Module({
   imports: [
@@ -22,6 +26,10 @@ import { GoogleStrategy } from './strategy/google.strategy';
       {
         name: User.name,
         schema: UserSchema,
+      },
+      {
+        name: Professional.name,
+        schema: ProfessionalSchema,
       },
     ]),
   ],

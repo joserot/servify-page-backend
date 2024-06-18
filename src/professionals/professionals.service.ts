@@ -72,6 +72,84 @@ export class ProfessionalsService {
       .exec();
   }
 
+  async addPhotos(
+    professionalId: string,
+    userId: string,
+    jobsImages: string[],
+  ) {
+    const professional = await this.professionalModel.findById(professionalId);
+    const professionalUserId = await professional.userId.toString();
+
+    if (professionalUserId !== userId) {
+      throw new HttpException(
+        'No se encontro el profesional',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (!jobsImages || jobsImages.length === 0) {
+      throw new HttpException(
+        'No se han subido imágenes',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const numberOfImages = jobsImages.length + professional.jobsImages.length;
+
+    if (numberOfImages > 10) {
+      throw new HttpException(
+        'Se han subido más de 10 imágenes',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const imagesUrl = await uploadMultipleImages(jobsImages);
+
+    const imagesArray = await imagesUrl.concat(professional.jobsImages);
+
+    return this.professionalModel.findByIdAndUpdate(
+      professionalId,
+      {
+        jobsImages: imagesArray,
+        active: false,
+      },
+      {
+        new: true,
+      },
+    );
+  }
+
+  async deletePhotoDto(
+    professionalId: string,
+    userId: string,
+    imageURl: string,
+  ) {
+    const professional = await this.professionalModel.findById(professionalId);
+    const professionalUserId = await professional.userId.toString();
+
+    if (professionalUserId !== userId) {
+      throw new HttpException(
+        'No se encontro el profesional',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const currentJobsImages = professional.jobsImages;
+    const filteredJobsImages = currentJobsImages.filter(
+      (jobImage) => jobImage !== imageURl,
+    );
+
+    return this.professionalModel.findByIdAndUpdate(
+      professionalId,
+      {
+        jobsImages: filteredJobsImages,
+      },
+      {
+        new: true,
+      },
+    );
+  }
+
   async create(_createProfessionalDto: CreateProfessionalDto, file: any) {
     const {
       name,

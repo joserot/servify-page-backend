@@ -24,6 +24,8 @@ import {
   FileInterceptor,
   FileFieldsInterceptor,
 } from '@nestjs/platform-express';
+import { AddPhotosDto } from './dto/add-photos.dto';
+import { deletePhotoDto } from './dto/delete-photo.dto';
 
 @ApiTags('professionals')
 @Controller('professionals')
@@ -49,6 +51,37 @@ export class ProfessionalsController {
   @Get('profile/:userId')
   findByUserId(@Param('userId') userId: string) {
     return this.professionalsService.findByUserId(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/photos/:id')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'jobsImages', maxCount: 10 }]),
+  )
+  addPhotos(
+    @Param('id') id: string,
+    @Body() addPhotosDto: AddPhotosDto,
+
+    @UploadedFiles()
+    files: {
+      jobsImages?;
+    },
+  ) {
+    const { jobsImages } = files;
+    const { userId } = addPhotosDto;
+
+    return this.professionalsService.addPhotos(id, userId, jobsImages);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/photos/:id')
+  deletePhoto(
+    @Param('id') id: string,
+    @Query() deletePhotoDto: deletePhotoDto,
+  ) {
+    const { userId, imageUrl } = deletePhotoDto;
+
+    return this.professionalsService.deletePhotoDto(id, userId, imageUrl);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuardGuard)

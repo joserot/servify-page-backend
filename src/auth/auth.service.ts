@@ -11,6 +11,7 @@ import {
   ProfessionalDocument,
 } from 'src/professionals/schema/professional.schema';
 import { RegisterAuthProfessionalDto } from './dto/register-auth-professional.dto';
+import { ChangePasswordAuthDto } from './dto/change-password-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -122,6 +123,40 @@ export class AuthService {
     const newUser = await this.userModel.create(userParse);
 
     return this.login(userBody);
+  }
+
+  public async changePassword(
+    userId: string,
+    changePasswordBody: ChangePasswordAuthDto,
+  ) {
+    const { currentPassword, newPassword } = changePasswordBody;
+
+    const userExist = await this.userModel.findOne({ _id: userId });
+
+    if (!userExist) {
+      throw new HttpException('El usuario no existe', HttpStatus.NOT_FOUND);
+    }
+
+    if (currentPassword === newPassword) {
+      throw new HttpException(
+        'La contraseña actual es igual a la nueva',
+        HttpStatus.CONFLICT,
+      );
+    }
+    const isCheck = await compareHash(currentPassword, userExist.password);
+
+    if (!isCheck) {
+      throw new HttpException(
+        'La contraseña es incorrecta',
+        HttpStatus.CONFLICT,
+      );
+    } else {
+      userExist.password = await generateHash(newPassword);
+
+      await userExist.save();
+
+      return userExist;
+    }
   }
 
   public async registerProfessional(userBody: RegisterAuthProfessionalDto) {

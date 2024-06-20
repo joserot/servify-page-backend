@@ -17,6 +17,7 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GoogleOauthGuard } from './google-oauth.guard';
 import { FRONTEND_URL } from 'src/constants/constants';
 import { RegisterAuthProfessionalDto } from './dto/register-auth-professional.dto';
+import { ChangePasswordAuthDto } from './dto/change-password-auth.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,6 +32,17 @@ export class AuthController {
   @Post('register')
   handleRegister(@Body() registerBody: RegisterAuthDto) {
     return this.authService.register(registerBody);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  handleChangePassword(
+    @Body() changePasswordBody: ChangePasswordAuthDto,
+    @Request() req,
+  ) {
+    const userId = req.user._id;
+
+    return this.authService.changePassword(userId, changePasswordBody);
   }
 
   @Post('/register/professional')

@@ -9,6 +9,9 @@ import { User } from 'src/users/schema/user.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { generateHash } from 'src/auth/utils/handleBcrypt';
 
+import resizeAvatar from 'src/functions/resize-avatar';
+import resizeJobImage from 'src/functions/resize-job-image';
+
 import uploadImage from 'src/functions/upload-image';
 
 import uploadMultipleImages from 'src/functions/upload-multiple-images';
@@ -103,7 +106,14 @@ export class ProfessionalsService {
       );
     }
 
-    const imagesUrl = await uploadMultipleImages(jobsImages);
+    const jobImagesResized = await Promise.all(
+      jobsImages.map(async (jobImage) => {
+        const image = await resizeJobImage(jobImage);
+        return image;
+      }),
+    );
+
+    const imagesUrl = await uploadMultipleImages(jobImagesResized);
 
     const imagesArray = await imagesUrl.concat(professional.jobsImages);
 
@@ -364,7 +374,9 @@ export class ProfessionalsService {
         },
       );
     } else {
-      const imageUrl = await uploadImage(avatar);
+      const image = await resizeAvatar(avatar);
+
+      const imageUrl = await uploadImage(image);
 
       const professional = await this.professionalModel.findByIdAndUpdate(
         id,

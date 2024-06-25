@@ -11,6 +11,7 @@ import { generateHash } from 'src/auth/utils/handleBcrypt';
 
 import resizeAvatar from 'src/functions/resize-avatar';
 import resizeJobImage from 'src/functions/resize-job-image';
+import deleteImage from 'src/functions/delete-image';
 
 import uploadImage from 'src/functions/upload-image';
 
@@ -132,7 +133,7 @@ export class ProfessionalsService {
   async deletePhotoDto(
     professionalId: string,
     userId: string,
-    imageURl: string,
+    imageUrl: string,
   ) {
     const professional = await this.professionalModel.findById(professionalId);
     const professionalUserId = await professional.userId.toString();
@@ -144,9 +145,15 @@ export class ProfessionalsService {
       );
     }
 
+    const image = await deleteImage(imageUrl);
+
+    if (!image) {
+      throw new HttpException('No se encontro la imagen', HttpStatus.NOT_FOUND);
+    }
+
     const currentJobsImages = professional.jobsImages;
     const filteredJobsImages = currentJobsImages.filter(
-      (jobImage) => jobImage !== imageURl,
+      (jobImage) => jobImage !== imageUrl,
     );
 
     return this.professionalModel.findByIdAndUpdate(

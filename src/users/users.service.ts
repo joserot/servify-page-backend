@@ -6,6 +6,8 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import uploadImage from 'src/functions/upload-image';
 
+import resizeAvatar from 'src/functions/resize-avatar';
+
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
@@ -27,7 +29,9 @@ export class UsersService {
       });
     }
 
-    const imageUrl = await uploadImage(file);
+    const image = await resizeAvatar(file);
+
+    const imageUrl = await uploadImage(image);
 
     return this.userModel.findByIdAndUpdate(
       id,

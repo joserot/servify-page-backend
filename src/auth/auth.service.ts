@@ -41,6 +41,9 @@ export class AuthService {
 
       const payload = {
         id: newUser._id,
+        name: newUser.name,
+        lastName: newUser.lastName,
+        roles: newUser.roles,
       };
 
       const token = this.jwtService.sign(payload);
@@ -54,6 +57,9 @@ export class AuthService {
     } else {
       const payload = {
         id: userExist._id,
+        name: userExist.name,
+        lastName: userExist.lastName,
+        roles: userExist.roles,
       };
 
       const token = this.jwtService.sign(payload);
@@ -92,6 +98,9 @@ export class AuthService {
 
     const payload = {
       id: userFlat._id,
+      name: userFlat.name,
+      lastName: userFlat.lastName,
+      roles: userFlat.roles,
     };
 
     const token = this.jwtService.sign(payload);

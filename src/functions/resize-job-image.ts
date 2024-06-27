@@ -7,6 +7,7 @@ export default async function resizeJobImage(file: any) {
       height: 500,
       fit: 'cover',
     })
+    .withMetadata()
     .toBuffer({ resolveWithObject: true });
 
   return {

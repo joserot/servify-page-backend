@@ -2,6 +2,7 @@ import * as sharp from 'sharp';
 
 export default async function resizeJobImage(file: any) {
   const image = await sharp(file.buffer)
+    .rotate()
     .resize({
       width: 500,
       height: 500,

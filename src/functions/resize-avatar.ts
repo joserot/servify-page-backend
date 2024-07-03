@@ -2,6 +2,7 @@ import * as sharp from 'sharp';
 
 export default async function resizeAvatar(file: any) {
   const image = await sharp(file.buffer)
+    .rotate()
     .resize({
       width: 200,
       height: 200,

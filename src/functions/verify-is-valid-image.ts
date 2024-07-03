@@ -18,7 +18,7 @@ export default async function verifyIsValidImage(file: any) {
   // Check if the uploaded file is allowed
 
   if (
-    !array_of_allowed_files.includes(file_extension) ||
+    !array_of_allowed_files.includes(file_extension.toLowerCase()) ||
     !array_of_allowed_file_types.includes(mimetype)
   ) {
     console.log('archivo no permitido');
